@@ -1,0 +1,141 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: linkforge-mongodb
+    restart: unless-stopped
+    # BLOCKER FIX #7: No public port binding — DB accessible only inside Docker network
+    expose:
+      - "27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - linkforge-net
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: linkforge-redis
+    restart: unless-stopped
+    # BLOCKER FIX #7: No public port binding — Redis accessible only inside Docker network
+    expose:
+      - "6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - linkforge-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.api
+    container_name: linkforge-api
+    restart: unless-stopped
+    # API port NOT exposed publicly — Nginx proxies to it internally
+    expose:
+      - "4000"
+    # BLOCKER FIX #3: Secrets loaded from .env file on the EC2 host, never hardcoded
+    env_file:
+      - .env.production
+    environment:
+      - NODE_ENV=production
+      - API_PORT=4000
+      - MONGODB_URI=mongodb://mongodb:27017/linkforge
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=info
+      - METRICS_ENABLED=true
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - linkforge-net
+
+  worker:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.worker
+    container_name: linkforge-worker
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/linkforge
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=info
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - linkforge-net
+
+  web:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.web
+    container_name: linkforge-web
+    restart: unless-stopped
+    # Web port NOT exposed publicly — Nginx proxies to it internally
+    expose:
+      - "3000"
+    env_file:
+      - .env.production
+    environment:
+      - NODE_ENV=production
+      - API_BASE_URL=http://api:4000
+    depends_on:
+      - api
+    networks:
+      - linkforge-net
+
+  nginx:
+    image: nginx:alpine
+    container_name: linkforge-nginx
+    restart: unless-stopped
+    # Only Nginx is public-facing: port 80 (HTTP) and 443 (HTTPS)
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      # TLS certificates mounted from host (populated by Certbot)
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - web
+      - api
+    networks:
+      - linkforge-net
+
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    container_name: linkforge-prometheus
+    restart: unless-stopped
+    # Prometheus NOT exposed publicly — internal only
+    expose:
+      - "9090"
+    volumes:
+      - ./infra/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - api
+    networks:
+      - linkforge-net
+
+networks:
+  linkforge-net:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+  redis_data:

@@ -1,0 +1,142 @@
+# =============================================================================
+# LinkForge — Comprehensive .gitignore
+# Protects secrets, credentials, databases, build artifacts, and dependencies.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 1. SECRETS, CREDENTIALS & SENSITIVE KEYS (CRITICAL)
+# -----------------------------------------------------------------------------
+# Environment files (never commit real secrets)
+.env
+.env.*
+.env*.local
+.env.production
+.env.staging
+
+# Explicitly allow safe example templates to be tracked
+!.env.example
+!.env.production.example
+
+# SSH and TLS Keys, certificates, credentials
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+*.pub
+id_rsa*
+id_ed25519*
+secrets/
+
+# -----------------------------------------------------------------------------
+# 2. LOCAL DATABASES & PERSISTENCE VOLUMES (Prevents 100MB+ dumps)
+# -----------------------------------------------------------------------------
+# MongoDB local data directory
+data/
+data/db/
+mongodb_data/
+*.wt
+*.turtle
+WiredTiger*
+
+# Redis dump and state files
+dump.rdb
+redis_data/
+appendonlydir/
+
+# SQLite or general local database files
+*.sqlite
+*.sqlite3
+*.db
+
+# -----------------------------------------------------------------------------
+# 3. DEPENDENCIES & PACKAGE MANAGERS
+# -----------------------------------------------------------------------------
+node_modules/
+*/node_modules/
+*/*/node_modules/
+.pnp
+.pnp.js
+
+# -----------------------------------------------------------------------------
+# 4. BUILD ARTIFACTS & COMPILED OUTPUTS
+# -----------------------------------------------------------------------------
+# Next.js build output
+.next/
+apps/web/.next/
+out/
+
+# TypeScript & JavaScript compilation outputs
+dist/
+apps/*/dist/
+packages/*/dist/
+build/
+*.tsbuildinfo
+
+# Turbo / SWC cache
+.turbo/
+.swc/
+.eslintcache
+
+# -----------------------------------------------------------------------------
+# 5. TERRAFORM & CLOUD INFRASTRUCTURE SECRETS
+# -----------------------------------------------------------------------------
+# Local Terraform state and provider plugins
+infra/terraform/.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+# Terraform variable values containing real IPs/keys
+*.tfvars
+*.tfvars.json
+infra/terraform/terraform.tfvars
+!infra/terraform/terraform.tfvars.example
+
+# AWS credentials
+.aws/
+
+# -----------------------------------------------------------------------------
+# 6. LOGS & DIAGNOSTICS
+# -----------------------------------------------------------------------------
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# -----------------------------------------------------------------------------
+# 7. TESTING & COVERAGE
+# -----------------------------------------------------------------------------
+coverage/
+.nyc_output/
+
+# -----------------------------------------------------------------------------
+# 8. OPERATING SYSTEM & EDITOR FILES
+# -----------------------------------------------------------------------------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editors & IDEs
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.sublime-workspace
+*.sublime-project
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.bak

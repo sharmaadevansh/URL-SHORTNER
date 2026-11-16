@@ -1,0 +1,26 @@
+{
+  "name": "linkforge",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production-Ready URL Shortening Platform",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev -w @linkforge/api",
+    "dev:web": "npm run dev -w @linkforge/web",
+    "dev:worker": "npm run dev -w @linkforge/worker",
+    "dev": "concurrently -n \"api,worker,web\" -c \"blue,green,magenta\" \"npm run dev -w @linkforge/api\" \"npm run dev -w @linkforge/worker\" \"npm run dev -w @linkforge/web\"",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "start:api": "npm run start -w @linkforge/api",
+    "start:web": "npm run start -w @linkforge/web",
+    "start:worker": "npm run start -w @linkforge/worker"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.4.5"
+  }
+}
