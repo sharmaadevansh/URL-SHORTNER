@@ -1,0 +1,54 @@
+# =============================================================================
+# LinkForge — Docker Build Ignore (.dockerignore)
+# Minimizes Docker build context transfer and prevents host leaks
+# =============================================================================
+
+# Dependencies (built freshly inside builder container)
+node_modules
+**/node_modules
+.pnp
+.pnp.js
+
+# Build outputs and cache from local host
+.next
+apps/web/.next
+dist
+apps/*/dist
+packages/*/dist
+build
+*.tsbuildinfo
+.turbo
+.swc
+
+# Local database directories and dumps
+data/
+data/db/
+mongodb_data/
+redis_data/
+dump.rdb
+*.wt
+WiredTiger*
+
+# Environment and secrets (secrets injected via env_file at runtime)
+.env
+.env.production
+.env*.local
+*.pem
+*.key
+
+# Git and CI/CD
+.git
+.github
+
+# Documentation and design
+docs/
+*.md
+
+# Logs
+*.log
+npm-debug.log*
+
+# Terraform
+infra/terraform/.terraform
+infra/terraform/*.tfstate*
+infra/terraform/terraform.tfvars

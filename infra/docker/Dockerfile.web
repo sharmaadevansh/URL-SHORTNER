@@ -3,26 +3,39 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Build arguments for client-side environment variables in Next.js
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
+# Copy package manifests for optimal layer caching
 COPY package*.json ./
 COPY packages/shared/package*.json ./packages/shared/
 COPY apps/web/package*.json ./apps/web/
 
 RUN npm ci
 
+# Copy configuration and source files
 COPY tsconfig.base.json ./
 COPY packages/shared ./packages/shared
 COPY apps/web ./apps/web
 
+# Ensure public directory exists so runner COPY never fails if public is empty or missing
+RUN mkdir -p apps/web/public
+
+# Build shared contracts and Next.js production bundle
 RUN npm run build -w @linkforge/shared
 RUN npm run build -w @linkforge/web
 
+# Production Runner Stage
 FROM node:20-alpine AS runner
 
 WORKDIR /app
 ENV NODE_ENV=production
 
+# Security: run as non-root user
 USER node
 
+# Copy dependencies and production build outputs with correct permissions
 COPY --chown=node:node --from=builder /app/package*.json ./
 COPY --chown=node:node --from=builder /app/node_modules ./node_modules
 COPY --chown=node:node --from=builder /app/packages/shared/dist ./packages/shared/dist
