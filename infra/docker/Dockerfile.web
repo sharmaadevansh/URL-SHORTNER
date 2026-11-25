@@ -15,15 +15,13 @@ COPY apps/web/package*.json ./apps/web/
 RUN npm ci
 
 # Copy configuration and source files
-COPY tsconfig.base.json ./
 COPY packages/shared ./packages/shared
 COPY apps/web ./apps/web
 
 # Ensure public directory exists so runner COPY never fails if public is empty or missing
 RUN mkdir -p apps/web/public
 
-# Build shared contracts and Next.js production bundle
-RUN npm run build -w @linkforge/shared
+# Build Next.js production bundle
 RUN npm run build -w @linkforge/web
 
 # Production Runner Stage
@@ -38,7 +36,7 @@ USER node
 # Copy dependencies and production build outputs with correct permissions
 COPY --chown=node:node --from=builder /app/package*.json ./
 COPY --chown=node:node --from=builder /app/node_modules ./node_modules
-COPY --chown=node:node --from=builder /app/packages/shared/dist ./packages/shared/dist
+COPY --chown=node:node --from=builder /app/packages/shared/src ./packages/shared/src
 COPY --chown=node:node --from=builder /app/packages/shared/package*.json ./packages/shared/
 COPY --chown=node:node --from=builder /app/apps/web/.next ./apps/web/.next
 COPY --chown=node:node --from=builder /app/apps/web/public ./apps/web/public

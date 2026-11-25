@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: linkforge-api
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm run start -w @linkforge/api
+    healthCheckPath: /health/live
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: info
+      - key: METRICS_ENABLED
+        value: "true"
+      - key: DISABLE_REDIS_QUEUE
+        value: "true"
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: MONGODB_URI
+        sync: false
+      - key: PUBLIC_APP_URL
+        sync: false
+      - key: API_BASE_URL
+        sync: false

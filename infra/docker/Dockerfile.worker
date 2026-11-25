@@ -1,5 +1,5 @@
 # Multi-stage Dockerfile for LinkForge Analytics Worker
-FROM node:20-alpine AS builder
+FROM node:20-alpine AS deps
 
 WORKDIR /app
 
@@ -7,14 +7,7 @@ COPY package*.json ./
 COPY packages/shared/package*.json ./packages/shared/
 COPY apps/worker/package*.json ./apps/worker/
 
-RUN npm ci
-
-COPY tsconfig.base.json ./
-COPY packages/shared ./packages/shared
-COPY apps/worker ./apps/worker
-
-RUN npm run build -w @linkforge/shared
-RUN npm run build -w @linkforge/worker
+RUN npm ci --omit=dev
 
 FROM node:20-alpine AS runner
 
@@ -23,11 +16,11 @@ ENV NODE_ENV=production
 
 USER node
 
-COPY --chown=node:node --from=builder /app/package*.json ./
-COPY --chown=node:node --from=builder /app/node_modules ./node_modules
-COPY --chown=node:node --from=builder /app/packages/shared/dist ./packages/shared/dist
-COPY --chown=node:node --from=builder /app/packages/shared/package*.json ./packages/shared/
-COPY --chown=node:node --from=builder /app/apps/worker/dist ./apps/worker/dist
-COPY --chown=node:node --from=builder /app/apps/worker/package*.json ./apps/worker/
+COPY --chown=node:node --from=deps /app/package*.json ./
+COPY --chown=node:node --from=deps /app/node_modules ./node_modules
+COPY --chown=node:node packages/shared/src ./packages/shared/src
+COPY --chown=node:node packages/shared/package*.json ./packages/shared/
+COPY --chown=node:node apps/worker/src ./apps/worker/src
+COPY --chown=node:node apps/worker/package*.json ./apps/worker/
 
-CMD ["node", "apps/worker/dist/index.js"]
+CMD ["node", "apps/worker/src/index.js"]
