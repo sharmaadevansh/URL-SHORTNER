@@ -10,8 +10,8 @@ export function ClicksChart({ data }) {
         return <div className="h-64 w-full bg-gray-50 animate-pulse rounded-md"/>;
     }
     const formattedData = data.map((d) => {
-        const date = new Date(d.date);
-        const label = `${date.toLocaleString('en-US', { month: 'short' })} ${date.getDate()}`;
+        const date = new Date(`${d.date}T00:00:00Z`);
+        const label = `${date.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' })} ${date.getUTCDate()}`;
         return {
             name: label,
             clicks: d.clicks,
