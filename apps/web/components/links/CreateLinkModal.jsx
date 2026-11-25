@@ -102,12 +102,7 @@ export function CreateLinkModal({ isOpen, onClose, onCreated, initialUrl = '' })
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title={createdLink ? 'Link created!' : 'Create new link'}
-      description={
-        createdLink
-          ? 'Your short link is live and ready to share.'
-          : 'Turn a long URL into an optimized short link.'
-      }
+      title={createdLink ? 'Link created' : 'Create new link'}
       maxWidth="md"
     >
       {createdLink ? (

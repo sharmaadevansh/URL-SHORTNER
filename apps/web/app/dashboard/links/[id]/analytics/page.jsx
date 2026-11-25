@@ -66,8 +66,7 @@ export default function LinkAnalyticsPage() {
   return (
     <DashboardShell>
       <TopBar
-        title="Link Analytics"
-        subtitle="Real-time click velocity, referrer sources, device types, and browser breakdown."
+        title="Analytics"
         actions={
           <Link href="/dashboard">
             <Button variant="outline" size="sm" className="gap-1.5 text-xs">
@@ -183,12 +182,7 @@ export default function LinkAnalyticsPage() {
             {/* Clicks Over Time Chart Card */}
             <Card className="p-6">
               <div className="flex items-center justify-between pb-4 border-b border-gray-100">
-                <div>
-                  <h3 className="text-sm font-bold text-gray-900 tracking-tight">Clicks Over Time</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    Click velocity for the selected time window
-                  </p>
-                </div>
+                <h3 className="text-sm font-bold text-gray-900 tracking-tight">Clicks Over Time</h3>
               </div>
               {isLoading ? (
                 <div className="h-64 w-full bg-gray-50 animate-pulse rounded-md mt-4" />

@@ -78,8 +78,7 @@ function DashboardContent() {
   return (
     <DashboardShell>
       <TopBar
-        title="Links Dashboard"
-        subtitle="Create, manage, and track performance across your shortened URLs."
+        title="Links"
         actions={
           <Button
             variant="primary"

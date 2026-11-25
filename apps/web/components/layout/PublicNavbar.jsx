@@ -32,8 +32,7 @@ export function PublicNavbar() {
 
   const navLinks = [
     { label: 'Features', href: '/#features' },
-    { label: 'How It Works', href: '/#how-it-works' },
-    { label: 'Architecture', href: '/#architecture' },
+    { label: 'Tech Stack', href: '/#architecture' },
   ];
 
   return (
